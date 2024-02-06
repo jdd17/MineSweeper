@@ -9,17 +9,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 //import java.awt.event.*;
 
-class Box
+class Box // Boxes on the grid
 {
     int x;
     int y;
     int width;
     int height;
-    int neighbors;
+    int neighbors; // Tracks number of mines adjacent to each box
     Color color;
-    boolean isMine;
-    boolean clicked;
-    boolean flagged;
+    boolean isMine; // Tracks if the box contains a mine
+    boolean clicked; // Tracks if the box has been clicked
+    boolean flagged; // Tracks if the box has been flagged
 
     public Box(int x, int y, int width, int height, Color color, int neighbors, boolean isMine, boolean clicked, boolean flagged)
     {
@@ -36,15 +36,15 @@ class Box
 }
 public class MineSweeper
 {
-    private static List<Box> boxes;
+    private static List<Box> boxes; // Array of boxes
     private static JPanel panel;
     private static boolean gameOver = false;
     private static boolean gameWon = false;
     private static int timeMin = 0;
     private static int timeSec = 0;
     private static int randMine = 0;
-    private static int numFlags = 0;
-    private static int numNotMines = 2500;
+    private static int numFlags = 0; // Initially, zero flags are possible
+    private static int numNotMines = 2500; // Initially, zero boxes have mines
     private static Timer timer;
     Color colorBox = new Color(194,194,194);
 
@@ -59,14 +59,14 @@ public class MineSweeper
 
     public void startGame()
     {
-        JFrame frame = new JFrame("MineSweeper");
+        JFrame frame = new JFrame("MineSweeper"); // MineSweeper windowo
 
         frame.setSize(780, 825);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         boxes = new ArrayList<>();
 
-        for (int i = 1; i <= 50; i++)
+        for (int i = 1; i <= 50; i++) // Create all of the boxes (50x50)
         {
             for (int j = 1; j <= 50; j++)
             {
@@ -78,19 +78,19 @@ public class MineSweeper
 
         for (int i = 0; i <= 2499; i++)
         {
-            randMine = rand.nextInt(100);
+            randMine = rand.nextInt(100); // Assign each box some random number
 
-            if (randMine <= 15)
+            if (randMine <= 15) // Give each box a 15% chance of having a mine
             {
-                boxes.get(i).isMine = true;
+                boxes.get(i).isMine = true; // When needed, update the necessary flags
                 numFlags++;
                 numNotMines--;
             }
         }
 
-        for (int i = 0; i <= 2499; i++)
+        for (int i = 0; i <= 2499; i++) // For each box, determine how many adjacent boxes contain mines
         {
-            if (i == 0)
+            if (i == 0) // Check three adjacent boxes for the top left box
             {
                 if (boxes.get(i + 1).isMine)
                 {
@@ -105,7 +105,7 @@ public class MineSweeper
                     boxes.get(i).neighbors++;
                 }
             }
-            else if (i == 49)
+            else if (i == 49) // Check three adjacent boxes for the top right box
             {
                 if (boxes.get(i - 1).isMine)
                 {
@@ -120,7 +120,7 @@ public class MineSweeper
                     boxes.get(i).neighbors++;
                 }
             }
-            else if (i == 2450)
+            else if (i == 2450) // Check three adjacent boxes for the bottom left box
             {
                 if (boxes.get(i + 1).isMine)
                 {
@@ -135,7 +135,7 @@ public class MineSweeper
                     boxes.get(i).neighbors++;
                 }
             }
-            else if (i == 2499)
+            else if (i == 2499) // Check three adjacent boxes for the bottom right box
             {
                 if (boxes.get(i - 1).isMine)
                 {
@@ -150,7 +150,7 @@ public class MineSweeper
                     boxes.get(i).neighbors++;
                 }
             }
-            else if (i < 49)
+            else if (i < 49) // Check five adjacent boxes for the top row of boxes
             {
                 if (boxes.get(i - 1).isMine)
                 {
@@ -173,7 +173,7 @@ public class MineSweeper
                     boxes.get(i).neighbors++;
                 }
             }
-            else if ((i % 50) == 0)
+            else if ((i % 50) == 0) // Check five adjacent boxes for the leftmost column of boxes
             {
                 if (boxes.get(i - 50).isMine)
                 {
@@ -196,7 +196,7 @@ public class MineSweeper
                     boxes.get(i).neighbors++;
                 }
             }
-            else if (((i + 1) % 50) == 0)
+            else if (((i + 1) % 50) == 0) // Check five adjacent boxes for the rightmost column of boxes
             {
                 if (boxes.get(i - 51).isMine)
                 {
@@ -219,7 +219,7 @@ public class MineSweeper
                     boxes.get(i).neighbors++;
                 }
             }
-            else if (i > 2450)
+            else if (i > 2450) // Check five adjacent boxes for the bottom row of boxes
             {
                 if (boxes.get(i - 51).isMine)
                 {
@@ -242,7 +242,7 @@ public class MineSweeper
                     boxes.get(i).neighbors++;
                 }
             }
-            else
+            else // Check eight adjacent boxes for all other boxes
             {
                 if (boxes.get(i - 51).isMine)
                 {
@@ -292,37 +292,36 @@ public class MineSweeper
                 drawTimer(g);
                 drawGameOver(g);
                 drawMinesLeft(g);
-                //drawNotMinesLeft(g);
                 drawGameWon(g);
             }
         };
 
         frame.add(panel);
 
-        panel.addMouseListener(new MouseAdapter()
+        panel.addMouseListener(new MouseAdapter() // Check for box clicks
         {
             @Override
-            public void mouseClicked(MouseEvent e)
+            public void mouseClicked(MouseEvent e) // When the mouse is clicked
             {
-                int clickedBox = getIndex(e.getX(), e.getY());
+                int clickedBox = getIndex(e.getX(), e.getY()); // Determine what box was clicked
 
-                if (!gameOver && !gameWon)
+                if (!gameOver && !gameWon) // If the game is still ongoing
                 {
-                    if (clickedBox != -1)
+                    if (clickedBox != -1) // Check if the box exists
                     {
-                        if (SwingUtilities.isLeftMouseButton(e))
+                        if (SwingUtilities.isLeftMouseButton(e)) // If it was a left mouse button
                         {
-                            if (!boxes.get(clickedBox).clicked)
+                            if (!boxes.get(clickedBox).clicked) // If the box is unclicked
                             {
-                                leftClickChange(clickedBox);
+                                leftClickChange(clickedBox); // Left-click the box
                             }
                         }
-                        else if (SwingUtilities.isRightMouseButton(e))
+                        else if (SwingUtilities.isRightMouseButton(e)) // If it was a right mouse button
                         {
-                            rightClickChange(clickedBox);
+                            rightClickChange(clickedBox); // Right-click the box
                         }
 
-                        panel.repaint();
+                        panel.repaint(); // Update the panel
                     }
                 }
             }
@@ -330,7 +329,7 @@ public class MineSweeper
 
         panel.setLayout(null);
 
-        JButton restartButton = new JButton("Restart");
+        JButton restartButton = new JButton("Restart"); // Add a restart button
         restartButton.setBounds(10, 770, 100, 25);
 
         restartButton.addActionListener(new ActionListener()
@@ -347,11 +346,11 @@ public class MineSweeper
         frame.setFocusable(true);
         frame.setVisible(true);
 
-        // Set up a Timer to repaint every second
+        // Have a timer run every second
         timer = new Timer(1000, new ActionListener()
         {
             @Override
-            public void actionPerformed(ActionEvent e)
+            public void actionPerformed(ActionEvent e) // Update the timer each second
             {
                 if (!gameOver && !gameWon)
                 {
@@ -366,7 +365,7 @@ public class MineSweeper
                     // Trigger a repaint to reflect the color update
                     panel.repaint();
                 }
-                else
+                else // If the game is finished, stop the timer
                 {
                     timer.stop();
                 }
@@ -381,9 +380,9 @@ public class MineSweeper
         }
     }
 
-    private static void drawBoxes(Graphics g)
+    private static void drawBoxes(Graphics g) // Logic for drawing each of the boxes
     {
-        Color colorBorder = new Color(132, 132, 132);
+        Color colorBorder = new Color(132, 132, 132); // Font colors
         Color color1 = new Color(8, 37, 244);
         Color color2 = new Color(61, 128, 41);
         Color color3 = new Color(235, 56, 42);
@@ -401,36 +400,36 @@ public class MineSweeper
             g.setColor(colorBorder);
             g.drawRect(box.x, box.y, box.width, box.height);
 
-            if (box.clicked)
+            if (box.clicked) // If the box is clicked
             {
-                if (box.neighbors == 0)
+                if (box.neighbors == 0) // And none of its adjacent boxes are mines
                 {
-                    if (box.isMine)
+                    if (box.isMine) // And this box is a mine
                     {
-                        g.setColor(Color.RED);
+                        g.setColor(Color.RED); // Then color it red
                         g.fillRect(box.x, box.y, box.width, box.height);
                     }
                     else
                     {
-                        g.setColor(box.color);
+                        g.setColor(box.color); // Otherwise maintain the same color
                         g.fillRect(box.x, box.y, box.width, box.height);
                     }
 
-                    g.setColor(colorBorder);
+                    g.setColor(colorBorder); // Add the border
                     g.drawRect(box.x, box.y, box.width, box.height);
                 }
-                else
+                else // If some adjacent boxes are mines
                 {
-                    if (box.isMine)
+                    if (box.isMine) // If the box is a mine
                     {
-                        g.setColor(Color.RED);
+                        g.setColor(Color.RED); // Color it red and add a border
                         g.fillRect(box.x, box.y, box.width, box.height);
                         g.setColor(colorBorder);
                         g.drawRect(box.x, box.y, box.width, box.height);
                     }
-                    else
+                    else // Otherwise determine its font color
                     {
-                        switch (box.neighbors)
+                        switch (box.neighbors) // Font color depends on how many adjacent mines
                         {
                             case 1:
                                 g.setColor(color1);
@@ -458,7 +457,7 @@ public class MineSweeper
                                 break;
                         }
 
-                        g.setFont(numFont);
+                        g.setFont(numFont); // Set the font and display the number of adjacent mines
                         g.drawString(Integer.toString(box.neighbors), box.x + box.width / 2 - 3, box.y + box.height / 2 + 5);
                     }
                 }
@@ -466,237 +465,237 @@ public class MineSweeper
         }
     }
 
-    private void leftClickChange(int i)
+    private void leftClickChange(int i) // Logic for left-clicking a box
     {
-        if(boxes.get(i).isMine)
+        if(boxes.get(i).isMine) // Game over if box is a mine
         {
             gameOver = true;
         }
 
-        boxes.get(i).color = colorBox;
+        boxes.get(i).color = colorBox; // Otherwise color the box and update flags
         boxes.get(i).clicked = true;
         numNotMines--;
 
-        if (numNotMines == 0)
+        if (numNotMines == 0) // If all non-mine boxes have been clicked, the game has been won
         {
             gameWon = true;
         }
 
-        if (boxes.get(i).neighbors == 0)
+        if (boxes.get(i).neighbors == 0) // If no neighbors
         {
-            if ((i % 50) != 0)
+            if ((i % 50) != 0) // If box is not on the leftmost column
             {
-                if ((i - 51) >= 0)
+                if ((i - 51) >= 0) // If adjacent box exists
                 {
-                    if (boxes.get(i - 51).neighbors == 0)
+                    if (boxes.get(i - 51).neighbors == 0) // If adjacent box also has no neighboring mines
                     {
-                        if (!boxes.get(i - 51).clicked)
+                        if (!boxes.get(i - 51).clicked) // If adjacent box has not been clicked
                         {
-                            if (!boxes.get(i - 51).isMine)
+                            if (!boxes.get(i - 51).isMine) // If adjacent box is not a mine
                             {
-                                leftClickChange(i - 51);
+                                leftClickChange(i - 51); // Left-click that adjacent box
                             }
                         }
                     }
-                    else
+                    else // If adjacent box has neighboring mines
                     {
-                        if (!boxes.get(i - 51).isMine)
+                        if (!boxes.get(i - 51).isMine) // If adjacent box is not a mine
                         {
-                            if (!boxes.get(i - 51).clicked)
+                            if (!boxes.get(i - 51).clicked) // If adjacent box has not been clicked
                             {
-                                boxes.get(i - 51).color = colorBox;
-                                boxes.get(i - 51).clicked = true;
-                                numNotMines--;
+                                boxes.get(i - 51).color = colorBox; // Change the color of that adjacent box
+                                boxes.get(i - 51).clicked = true; // Consider that adjacent box clicked
+                                numNotMines--; // Update flag
                             }
                         }
                     }
                 }
             }
-            if ((i - 50) >= 0)
+            if ((i - 50) >= 0) // If adjacent box exists
             {
-                if (boxes.get(i - 50).neighbors == 0)
+                if (boxes.get(i - 50).neighbors == 0) // If adjacent box also has no neighboring mines
                 {
-                    if (!boxes.get(i - 50).clicked)
+                    if (!boxes.get(i - 50).clicked) // If adjacent box has not been clicked
                     {
-                        if (!boxes.get(i - 50).isMine)
+                        if (!boxes.get(i - 50).isMine) // If adjacent box is not a mine
                         {
-                            leftClickChange(i - 50);
+                            leftClickChange(i - 50); // Left-click that adjacent box
                         }
                     }
                 }
-                else
+                else // If adjacent box has neighboring mines
                 {
-                    if (!boxes.get(i - 50).isMine)
+                    if (!boxes.get(i - 50).isMine) // If adjacent box is not a mine
                     {
-                        if (!boxes.get(i - 50).clicked)
+                        if (!boxes.get(i - 50).clicked) // If adjacent box has not been clicked
                         {
-                            boxes.get(i - 50).color = colorBox;
-                            boxes.get(i - 50).clicked = true;
-                            numNotMines--;
-                        }
-                    }
-                }
-            }
-            if (((i + 1) % 50) != 0)
-            {
-                if ((i - 49) >= 0)
-                {
-                    if (boxes.get(i - 49).neighbors == 0)
-                    {
-                        if (!boxes.get(i - 49).clicked)
-                        {
-                            if (!boxes.get(i - 49).isMine)
-                            {
-                                leftClickChange(i - 49);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (!boxes.get(i - 49).isMine)
-                        {
-                            if (!boxes.get(i - 49).clicked)
-                            {
-                                boxes.get(i - 49).color = colorBox;
-                                boxes.get(i - 49).clicked = true;
-                                numNotMines--;
-                            }
+                            boxes.get(i - 50).color = colorBox; // Change the color of that adjacent box
+                            boxes.get(i - 50).clicked = true; // Consider that adjacent box clicked
+                            numNotMines--; // Update flag
                         }
                     }
                 }
             }
-            if ((i % 50) != 0)
+            if (((i + 1) % 50) != 0) // If box is not on the rightmost column
             {
-                if ((i - 1) >= 0) // always evaluates to true anyways
+                if ((i - 49) >= 0) // If adjacent box exists
                 {
-                    if (boxes.get(i - 1).neighbors == 0)
+                    if (boxes.get(i - 49).neighbors == 0) // If adjacent box also has no neighboring mines
                     {
-                        if (!boxes.get(i - 1).clicked)
+                        if (!boxes.get(i - 49).clicked) // If adjacent box has not been clicked
                         {
-                            if (!boxes.get(i - 1).isMine)
+                            if (!boxes.get(i - 49).isMine) // If adjacent box is not a mine
                             {
-                                leftClickChange(i - 1);
+                                leftClickChange(i - 49); // Left-click that adjacent box
                             }
                         }
                     }
-                    else
+                    else // If adjacent box has neighboring mines
                     {
-                        if (!boxes.get(i - 1).isMine)
+                        if (!boxes.get(i - 49).isMine) // If adjacent box is not a mine
                         {
-                            if (!boxes.get(i - 1).clicked)
+                            if (!boxes.get(i - 49).clicked) // If adjacent box has not been clicked
                             {
-                                boxes.get(i - 1).color = colorBox;
-                                boxes.get(i - 1).clicked = true;
-                                numNotMines--;
+                                boxes.get(i - 49).color = colorBox; // Change the color of that adjacent box
+                                boxes.get(i - 49).clicked = true; // Consider that adjacent box clicked
+                                numNotMines--; // Update flag
                             }
                         }
                     }
                 }
             }
-            if (((i + 1) % 50) != 0)
+            if ((i % 50) != 0) // If box is not on the leftmost column
             {
-                if ((i + 1) <= 2499)
+                if ((i - 1) >= 0) // If adjacent box exists (always evaluates to true anyways)
                 {
-                    if (boxes.get(i + 1).neighbors == 0)
+                    if (boxes.get(i - 1).neighbors == 0) // If adjacent box also has no neighboring mines
                     {
-                        if (!boxes.get(i + 1).clicked)
+                        if (!boxes.get(i - 1).clicked) // If adjacent box has not been clicked
                         {
-                            if (!boxes.get(i + 1).isMine)
+                            if (!boxes.get(i - 1).isMine) // If adjacent box is not a mine
                             {
-                                leftClickChange(i + 1);
+                                leftClickChange(i - 1); // Left-click that adjacent box
                             }
                         }
                     }
-                    else
+                    else // If adjacent box has neighboring mines
                     {
-                        if (!boxes.get(i + 1).isMine)
+                        if (!boxes.get(i - 1).isMine) // If adjacent box is not a mine
                         {
-                            if (!boxes.get(i + 1).clicked)
+                            if (!boxes.get(i - 1).clicked) // If adjacent box has not been clicked
                             {
-                                boxes.get(i + 1).color = colorBox;
-                                boxes.get(i + 1).clicked = true;
-                                numNotMines--;
+                                boxes.get(i - 1).color = colorBox; // Change the color of that adjacent box
+                                boxes.get(i - 1).clicked = true; // Consider that adjacent box clicked
+                                numNotMines--; // Update flag
                             }
                         }
                     }
                 }
             }
-            if ((i % 50) != 0)
+            if (((i + 1) % 50) != 0) // If box is not on the rightmost column
             {
-                if ((i + 49) <= 2499)
+                if ((i + 1) <= 2499) // If adjacent box exists
                 {
-                    if (boxes.get(i + 49).neighbors == 0)
+                    if (boxes.get(i + 1).neighbors == 0) // If adjacent box also has no neighboring mines
                     {
-                        if (!boxes.get(i + 49).clicked)
+                        if (!boxes.get(i + 1).clicked) // If adjacent box has not been clicked
                         {
-                            if (!boxes.get(i + 49).isMine)
+                            if (!boxes.get(i + 1).isMine) // If adjacent box is not a mine
                             {
-                                leftClickChange(i + 49);
+                                leftClickChange(i + 1); // Left-click that adjacent box
                             }
                         }
                     }
-                    else
+                    else // If adjacent box has neighboring mines
                     {
-                        if (!boxes.get(i + 49).isMine)
+                        if (!boxes.get(i + 1).isMine) // If adjacent box is not a mine
                         {
-                            if (!boxes.get(i + 49).clicked)
+                            if (!boxes.get(i + 1).clicked) // If adjacent box has not been clicked
                             {
-                                boxes.get(i + 49).color = colorBox;
-                                boxes.get(i + 49).clicked = true;
-                                numNotMines--;
+                                boxes.get(i + 1).color = colorBox; // Change the color of that adjacent box
+                                boxes.get(i + 1).clicked = true; // Consider that adjacent box clicked
+                                numNotMines--; // Update flag
                             }
                         }
                     }
                 }
             }
-            if ((i + 50) <= 2499)
+            if ((i % 50) != 0) // If box is on not the leftmost column
             {
-                if (boxes.get(i + 50).neighbors == 0)
+                if ((i + 49) <= 2499) // If adjacent box exists
                 {
-                    if (!boxes.get(i + 50).clicked)
+                    if (boxes.get(i + 49).neighbors == 0) // If adjacent box also has no neighboring mines
                     {
-                        if (!boxes.get(i + 50).isMine)
+                        if (!boxes.get(i + 49).clicked) // If adjacent box has not been clicked
                         {
-                            leftClickChange(i + 50);
+                            if (!boxes.get(i + 49).isMine) // If adjacent box is not a mine
+                            {
+                                leftClickChange(i + 49); // Left-click that adjacent box
+                            }
                         }
                     }
-                }
-                else
-                {
-                    if (!boxes.get(i + 50).isMine)
+                    else // If adjacent box has neighboring mines
                     {
-                        if (!boxes.get(i + 50).clicked)
+                        if (!boxes.get(i + 49).isMine) // If adjacent box is not a mine
                         {
-                            boxes.get(i + 50).color = colorBox;
-                            boxes.get(i + 50).clicked = true;
-                            numNotMines--;
+                            if (!boxes.get(i + 49).clicked) // If adjacent box has not been clicked
+                            {
+                                boxes.get(i + 49).color = colorBox; // Change the color of that adjacent box
+                                boxes.get(i + 49).clicked = true; // Consider that adjacent box clicked
+                                numNotMines--; // Update flag
+                            }
                         }
                     }
                 }
             }
-            if (((i + 1) % 50) != 0)
+            if ((i + 50) <= 2499)  // If adjacent box exists
             {
-                if ((i + 51) <= 2499)
+                if (boxes.get(i + 50).neighbors == 0) // If adjacent box also has no neighboring mines
                 {
-                    if (boxes.get(i + 51).neighbors == 0)
+                    if (!boxes.get(i + 50).clicked) // If adjacent box has not been clicked
                     {
-                        if (!boxes.get(i + 51).clicked)
+                        if (!boxes.get(i + 50).isMine) // If adjacent box is not a mine
                         {
-                            if (!boxes.get(i + 51).isMine)
+                            leftClickChange(i + 50); // Left-click that adjacent box
+                        }
+                    }
+                }
+                else // If adjacent box has neighboring mines
+                {
+                    if (!boxes.get(i + 50).isMine) // If adjacent box is not a mine
+                    {
+                        if (!boxes.get(i + 50).clicked) // If adjacent box has not been clicked
+                        {
+                            boxes.get(i + 50).color = colorBox; // Change the color of that adjacent box
+                            boxes.get(i + 50).clicked = true; // Consider that adjacent box clicked
+                            numNotMines--; // Update flag
+                        }
+                    }
+                }
+            }
+            if (((i + 1) % 50) != 0) // If box is not on the rightmost column
+            {
+                if ((i + 51) <= 2499) // If adjacent box exists
+                {
+                    if (boxes.get(i + 51).neighbors == 0) // If adjacent box also has no neighboring mines
+                    {
+                        if (!boxes.get(i + 51).clicked) // If adjacent box has not been clicked
+                        {
+                            if (!boxes.get(i + 51).isMine) // If adjacent box is not a mine
                             {
-                                leftClickChange(i + 51);
+                                leftClickChange(i + 51); // Left-click that adjacent box
                             }
                         }
                     }
-                    else
+                    else // If adjacent box has neighboring mines
                     {
-                        if (!boxes.get(i + 51).isMine)
+                        if (!boxes.get(i + 51).isMine) // If adjacent box is not a mine
                         {
-                            if (!boxes.get(i + 51).clicked)
+                            if (!boxes.get(i + 51).clicked) // If adjacent box has not been clicked
                             {
-                                boxes.get(i + 51).color = colorBox;
-                                boxes.get(i + 51).clicked = true;
-                                numNotMines--;
+                                boxes.get(i + 51).color = colorBox; // Change the color of that adjacent box
+                                boxes.get(i + 51).clicked = true; // Consider that adjacent box clicked
+                                numNotMines--; // Update flag
                             }
                         }
                     }
@@ -705,21 +704,21 @@ public class MineSweeper
         }
     }
 
-    private void rightClickChange(int i)
+    private void rightClickChange(int i) // If a box was right-clicked
     {
-        if(boxes.get(i).flagged)
+        if(boxes.get(i).flagged) // is the box is flagged, remove the flag
         {
             boxes.get(i).flagged = false;
             numFlags++;
         }
-        else
+        else // Otherwise flag the box
         {
             boxes.get(i).flagged = true;
             numFlags--;
         }
     }
 
-    private int getIndex(int mouseX, int mouseY)
+    private int getIndex(int mouseX, int mouseY) // Function to determine which box was pressed
     {
         for (int i = 0; i < 2500; i++)
         {
@@ -733,7 +732,7 @@ public class MineSweeper
         return -1;
     }
 
-    private static void drawTimer(Graphics g)
+    private static void drawTimer(Graphics g) // Display the timer for the game
     {
         Font numFont = new Font("Arial", Font.BOLD, 13);
 
@@ -744,7 +743,7 @@ public class MineSweeper
 
     private static void drawGameOver(Graphics g)
     {
-        if(gameOver)
+        if(gameOver) // If the game is lost, display a message
         {
             Font numFont = new Font("Arial", Font.BOLD, 13);
 
@@ -754,7 +753,7 @@ public class MineSweeper
         }
     }
 
-    private static void drawMinesLeft(Graphics g)
+    private static void drawMinesLeft(Graphics g) // Display the number of flags left
     {
         Font numFont = new Font("Arial", Font.BOLD, 13);
 
@@ -765,7 +764,7 @@ public class MineSweeper
 
     private static void drawGameWon(Graphics g)
     {
-        if(gameWon)
+        if(gameWon) // If the game is won, display a message
         {
             Font numFont = new Font("Arial", Font.BOLD, 13);
 
@@ -775,7 +774,7 @@ public class MineSweeper
         }
     }
 
-    private static void drawEdges(Graphics g)
+    private static void drawEdges(Graphics g) // Shading for each box (visual depth)
     {
         Color topEdge = new Color(255, 255, 255);
         Color bottomEdge = new Color(128, 128, 128);
@@ -796,18 +795,18 @@ public class MineSweeper
 
     private static void drawFlags(Graphics g)
     {
-        Color flag = new Color(235, 56, 42);
+        Color flag = new Color(235, 56, 42); // Colors for flag graphic
         Color flagPole = new Color(8, 8, 8);
 
-        if(gameOver || gameWon)
+        if(gameOver || gameWon) // If the game is finished
         {
-            for (Box box : boxes)
+            for (Box box : boxes) // Unflag all boxes
             {
                 box.flagged = false;
             }
         }
 
-        for (Box box : boxes)
+        for (Box box : boxes) // Otherwise, show visual flags for each flagged box
         {
             if (box.flagged)
             {
@@ -821,15 +820,15 @@ public class MineSweeper
 
     private static void drawMines(Graphics g)
     {
-        Color sparkle = new Color(255, 255, 255);
+        Color sparkle = new Color(255, 255, 255); // Colors for mine graphic
         Color bomb = new Color(8, 8, 8);
         Color fuse = new Color(197, 167, 138);
 
-        if(gameOver || gameWon)
+        if(gameOver || gameWon) // If the game is finished
         {
             for (Box box : boxes)
             {
-                if (box.isMine)
+                if (box.isMine) // For each mine, display a mine visually
                 {
                     g.setColor(bomb);
                     g.fillRect((box.x)+5, (box.y)+4, 5, 9);
@@ -844,9 +843,9 @@ public class MineSweeper
         }
     }
 
-    private void restartGame()
+    private void restartGame() // Restart the game
     {
-        gameOver = false;
+        gameOver = false; // Reset variables
         gameWon = false;
         timeMin = 0;
         timeSec = 0;
@@ -854,7 +853,7 @@ public class MineSweeper
         numNotMines = 2500;
         timer.restart();
 
-        for (Box box: boxes)
+        for (Box box: boxes) // Reset box properties
         {
             box.isMine = false;
             box.neighbors = 0;
@@ -869,7 +868,7 @@ public class MineSweeper
         {
             randMine = rand.nextInt(100);
 
-            if (randMine <= 15)
+            if (randMine <= 15) // Give each box a chance to be a mine again
             {
                 boxes.get(i).isMine = true;
                 numFlags++;
@@ -879,7 +878,7 @@ public class MineSweeper
 
         for (int i = 0; i <= 2499; i++)
         {
-            if (i == 0)
+            if (i == 0) // Count adjacent mines for top left box
             {
                 if (boxes.get(i + 1).isMine)
                 {
@@ -894,7 +893,7 @@ public class MineSweeper
                     boxes.get(i).neighbors++;
                 }
             }
-            else if (i == 49)
+            else if (i == 49) // Count adjacent mines for top right box
             {
                 if (boxes.get(i - 1).isMine)
                 {
@@ -909,7 +908,7 @@ public class MineSweeper
                     boxes.get(i).neighbors++;
                 }
             }
-            else if (i == 2450)
+            else if (i == 2450) // Count adjacent mines for bottom left box
             {
                 if (boxes.get(i + 1).isMine)
                 {
@@ -924,7 +923,7 @@ public class MineSweeper
                     boxes.get(i).neighbors++;
                 }
             }
-            else if (i == 2499)
+            else if (i == 2499) // Count adjacent mines for bottom right box
             {
                 if (boxes.get(i - 1).isMine)
                 {
@@ -939,7 +938,7 @@ public class MineSweeper
                     boxes.get(i).neighbors++;
                 }
             }
-            else if (i < 49)
+            else if (i < 49) // Count adjacent mines for top row of boxes
             {
                 if (boxes.get(i - 1).isMine)
                 {
@@ -962,7 +961,7 @@ public class MineSweeper
                     boxes.get(i).neighbors++;
                 }
             }
-            else if ((i % 50) == 0)
+            else if ((i % 50) == 0) // Count adjacent mines for leftmost column of boxes
             {
                 if (boxes.get(i - 50).isMine)
                 {
@@ -985,7 +984,7 @@ public class MineSweeper
                     boxes.get(i).neighbors++;
                 }
             }
-            else if (((i + 1) % 50) == 0)
+            else if (((i + 1) % 50) == 0) // Count adjacent mines for rightmost column of boxes
             {
                 if (boxes.get(i - 51).isMine)
                 {
@@ -1008,7 +1007,7 @@ public class MineSweeper
                     boxes.get(i).neighbors++;
                 }
             }
-            else if (i > 2450)
+            else if (i > 2450) // Count adjacent mines for bottom row of boxes
             {
                 if (boxes.get(i - 51).isMine)
                 {
@@ -1031,7 +1030,7 @@ public class MineSweeper
                     boxes.get(i).neighbors++;
                 }
             }
-            else
+            else // Count adjacent mines for all other boxes
             {
                 if (boxes.get(i - 51).isMine)
                 {
@@ -1068,6 +1067,6 @@ public class MineSweeper
             }
         }
 
-        panel.repaint();
+        panel.repaint(); // Update the panel
     }
 }
